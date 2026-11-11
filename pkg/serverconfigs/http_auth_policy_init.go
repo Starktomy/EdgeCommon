@@ -9,6 +9,8 @@ import (
 
 // Init 初始化
 func (this *HTTPAuthPolicy) Init() error {
+	this.method = nil
+	this.initErr = nil
 	switch this.Type {
 	case HTTPAuthTypeBasicAuth:
 		this.method = NewHTTPAuthBasicMethod()
@@ -17,10 +19,13 @@ func (this *HTTPAuthPolicy) Init() error {
 	}
 
 	if this.method == nil {
-		return errors.New("unknown auth method '" + this.Type + "'")
+		this.initErr = errors.New("unknown auth method '" + this.Type + "'")
+		return this.initErr
 	}
 	err := this.method.Init(this.Params)
 	if err != nil {
+		this.initErr = err
+		this.method = nil
 		return err
 	}
 

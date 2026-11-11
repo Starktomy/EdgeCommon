@@ -4,16 +4,22 @@ package serverconfigs
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/iwind/TeaGo/rands"
 )
 
 func TestHTTPAuthRequestMethod_Filter(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.Method != http.MethodPost || req.Header.Get("Hello") != "World" {
+			t.Error("authentication subrequest lost its method or headers")
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
 	method := &HTTPAuthSubRequestMethod{}
 	err := method.Init(map[string]interface{}{
-		"url":    "http://127.0.0.1:2345/",
+		"url":    server.URL,
 		"method": http.MethodPost,
 	})
 	if err != nil {
@@ -32,6 +38,9 @@ func TestHTTPAuthRequestMethod_Filter(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+	if !b {
+		t.Fatal("successful authentication subrequest was rejected")
 	}
 	t.Log("result:", b, uri, uriChanged)
 }
@@ -52,7 +61,7 @@ func TestHTTPAuthRequestMethod_Filter_Path(t *testing.T) {
 	req.Header.Set("Hello", "World")
 	req.Header.Set("User-Agent", "GoEdge/1.0")
 	b, uri, uriChanged, err := method.Filter(req, func(subReq *http.Request) (status int, err error) {
-		status = rands.Int(200, 400)
+		status = http.StatusNoContent
 		t.Log("execute sub request:", subReq.URL, status)
 		return
 	}, func(s string) string {

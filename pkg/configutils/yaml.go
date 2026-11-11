@@ -3,7 +3,7 @@ package configutils
 import (
 	"os"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 func UnmarshalYamlFile(file string, ptr interface{}) error {

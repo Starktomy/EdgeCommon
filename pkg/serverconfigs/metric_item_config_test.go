@@ -11,7 +11,7 @@ func TestMetricItemConfig_CurrentTime_Month(t *testing.T) {
 			PeriodUnit: MetricItemPeriodUnitMonth,
 		}
 		_ = item.Init()
-		t.Logf(item.CurrentTime())
+		t.Log(item.CurrentTime())
 	}
 }
 

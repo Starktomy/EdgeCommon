@@ -2,6 +2,8 @@
 
 package serverconfigs
 
+import "errors"
+
 // HTTPAuthConfig 认证配置
 type HTTPAuthConfig struct {
 	IsPrior    bool                 `yaml:"isPrior" json:"isPrior"`
@@ -11,6 +13,9 @@ type HTTPAuthConfig struct {
 
 func (this *HTTPAuthConfig) Init() error {
 	for _, ref := range this.PolicyRefs {
+		if ref == nil {
+			return errors.New("authentication configuration contains a nil policy reference")
+		}
 		err := ref.Init()
 		if err != nil {
 			return err
