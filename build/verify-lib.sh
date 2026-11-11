@@ -73,9 +73,10 @@ verify_race() {
       verify_run_race ./internal/nodes ./internal/stats ./internal/rpc \
         ./internal/utils/counters ./internal/utils/expires ./internal/waf \
         ./internal/waf/requests ./internal/waf/checkpoints ./internal/waf/injectionutils \
-        -run '^Test(Security|ApplyMaxCPU|RequestBodyCheckpoint|RequestFormArgCheckpoint|RequestJSONArgCheckpoint|RequestUploadCheckpoint|ResponseBodyCheckpoint|WAFManager_convert|WAF_MatchRequest|DetectSQLInjection$)'
-      verify_run_race ./internal/caches ./internal/utils/kvstore -run '^Test(DependencyUpgrade|SecurityCache)'
+        -run '^Test(Security|ApplyMaxCPU|AccessLog|PermanentAccessLog|TrafficUploadPreservesStructured|RequestBodyCheckpoint|RequestFormArgCheckpoint|RequestJSONArgCheckpoint|RequestUploadCheckpoint|ResponseBodyCheckpoint|WAFManager_convert|WAF_MatchRequest|DetectSQLInjection$)'
+      verify_run_race ./internal/caches ./internal/utils/kvstore -run '^Test(DependencyUpgrade|Security(Cache|FileReader|OpenFile))'
       verify_run_race ./internal/utils/mem
+      verify_run_race ./internal/compressions -run '^TestSecurity'
       verify_run_race ./internal/configs ./internal/utils -run '^TestSecurityNode'
       verify_run_race ./internal/utils -run '^TestSimpleEncrypt'
       ;;

@@ -13,6 +13,10 @@ race tests and `govulncheck`; `all` also builds commands. Native Linux AMD64 is
 required for the race and vulnerability modes. The test selection fails if a
 package has no selected tests. Set `EDGE_VERIFY_JOBS=2` to reduce build pressure.
 
+Node's selected race suites also cover container resource budgets, compression
+pool ownership, file descriptor cache shutdown, and durable delivery replay.
+Use the matching Node revision when updating these shared test selections.
+
 Install the scanner with:
 
 ```sh
