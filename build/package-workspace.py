@@ -256,8 +256,14 @@ def main():
             raise ValueError("Admin APINodeVersion does not match the bundled API source version")
         for name in names:
             command([go, "mod", "verify"], cwd=source / name, env=env)
-        gowebp = Path(command([go, "list", "-m", "-f", "{{.Dir}}", "github.com/iwind/gowebp"],
-                             cwd=source / "EdgeNode", env=env, capture=True).strip())
+        # API/Admin caches need not contain Node-only modules. A module listing
+        # can return an empty Dir before the first Node build downloads gowebp.
+        # Download its pinned revision before resolving bundled license assets.
+        gowebp_info = json.loads(command([go, "mod", "download", "-json", "github.com/iwind/gowebp"],
+                                        cwd=source / "EdgeNode", env=env, capture=True))
+        gowebp = Path(gowebp_info.get("Dir", ""))
+        if not gowebp.is_absolute() or not gowebp.is_dir():
+            raise ValueError("cannot resolve downloaded gowebp module directory")
         # Default to committed source time, not wall-clock time. Set this to the
         # release's agreed timestamp when coordinating otherwise different refs.
         epoch = int(os.environ.get("SOURCE_DATE_EPOCH", max(int(command(
